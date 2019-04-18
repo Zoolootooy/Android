@@ -22,9 +22,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void clickOK (View view) {
+        /*
         Toast toast = Toast.makeText(getApplicationContext(),
                 "Запуск главной", Toast.LENGTH_SHORT);
         toast.show();
+        */
         Intent intent = new Intent(this, MainActivity.class);
         String S = "";
         S = name.getText().toString();

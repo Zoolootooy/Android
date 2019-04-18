@@ -1,109 +1,219 @@
 package com.example.a1.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.os.CountDownTimer;
+import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+
+import com.example.a1.MainActivity;
 import com.example.a1.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentGame.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FragmentGame#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Random;
+
+
 public class FragmentGame extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    int[] colors;
+    String[] names;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    Random random;
+    Button start, btYes, btNo;
+    int first, second, set, score;
+    TextView leftText, rightText,  textScore;
+    boolean scored;
+    boolean vibroCheck;
+    int value;
+    int time;
+    ProgressBar pb;
 
-    private OnFragmentInteractionListener mListener;
-
-    public FragmentGame() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentGame.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FragmentGame newInstance(String param1, String param2) {
-        FragmentGame fragment = new FragmentGame();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fragment_game, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_fragment_game, container, false);
+
+        textScore = (TextView) rootView.findViewById(R.id.textView3);
+
+        time = this.getArguments().getInt("time");
+        vibroCheck = this.getArguments().getBoolean("vibro");
+
+
+        first = 0;
+        second = 0;
+        set = 0;
+        score = 0;
+        value = 5;
+
+        rightText = (TextView) rootView.findViewById(R.id.textView2);
+        leftText = (TextView) rootView.findViewById(R.id.textView1);
+        pb = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        pb.setMax(time);
+
+
+        start = (Button) rootView.findViewById(R.id.btStartStop);
+        start.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (vibroCheck == true){
+                    long mills = 200L;
+                    Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                    if (vibrator.hasVibrator()) {
+                        vibrator.vibrate(mills);
+                    }
+                }
+
+                textScore.setText("");
+
+
+                start.setEnabled(false);
+                btYes.setEnabled(true);
+                btNo.setEnabled(true);
+
+                if (!scored){
+                    score = 0;
+                }
+
+
+
+                new CountDownTimer(time*1000, 1000){
+                    @Override
+                    public void onTick(long l){
+                        pb.setProgress((int)(l/1000));
+                    }
+
+                    @Override
+                    public void onFinish(){
+                        btYes.setEnabled(false);
+                        btNo.setEnabled(false);
+                        start.setEnabled(true);
+
+                        if (vibroCheck == true){
+                            long mills = 1000L;
+                            Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(mills);
+                            }
+                        }
+
+                        textScore.setText("Ваш счёт: " + Integer.toString(score));
+                    }
+                }.start();
+            }
+        });
+
+        btYes = (Button) rootView.findViewById(R.id.btYes);
+        btYes.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (first == second){
+                    score ++;
+                }
+
+                second = random.nextInt(value);
+                rightText.setTextColor(colors[second]);
+                set = random.nextInt(value);
+                rightText.setText(names[set]);
+
+                first = random.nextInt(value);
+                leftText.setText(names[first]);
+                set = random.nextInt(value);
+                leftText.setTextColor(colors[set]);
+            }
+        });
+
+        btNo = (Button) rootView.findViewById(R.id.btNo);
+        btNo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (first != second){
+                    score++;
+                }
+
+                second = random.nextInt(value);
+                rightText.setTextColor(colors[second]);
+                set = random.nextInt(value);
+                rightText.setText(names[set]);
+
+                first = random.nextInt(value);
+                leftText.setText(names[first]);
+                set = random.nextInt(value);
+                leftText.setTextColor(colors[set]);
+            }
+        });
+
+        btYes.setEnabled(false);
+        btNo.setEnabled(false);
+
+
+        colors = new int[10];
+
+        colors[0] = 0xFF000000; //black
+        colors[1] = 0xFFFF0000; //red
+        colors[2] = 0xFF0000FF; //blue
+        colors[3] = 0xFF008000; //green
+        colors[4] = 0xFFFFFF00; //yellow
+
+        colors[5] = 0xFF808080; //gray
+        colors[6] = 0xFFFFC0CB; //pink
+        colors[7] = 0xFFA52A2A; //brown
+        colors[8] = 0xFFFFA500; //orange
+        colors[9] = 0xFFBA2BE2; //violet
+
+        names = new String[10];
+
+        names[0] = "Чёрный";
+        names[1] = "Красный";
+        names[2] = "Синий";
+        names[3] = "Зелёный";
+        names[4] = "Жёлтый";
+
+        names[5] = "Серый";
+        names[6] = "Розовый";
+        names[7] = "Коричневый";
+        names[8] = "Оранжевый";
+        names[9] = "Фиолетовый";
+
+        random = new Random();
+
+
+        value = 5;
+
+
+        second = random.nextInt(value);
+        rightText.setTextColor(colors[second]);
+        set = random.nextInt(value);
+        rightText.setText(names[set]);
+
+        first = random.nextInt(value);
+        leftText.setText(names[first]);
+        set = random.nextInt(value);
+        leftText.setTextColor(colors[set]);
+
+
+
+
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+    public void SetTimeVibro(int t, boolean v){
+        time = t;
+        vibroCheck = v;
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

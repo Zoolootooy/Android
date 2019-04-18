@@ -17,11 +17,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.a1.Fragments.FragmentGame;
 import com.example.a1.Fragments.FragmentSettings;
 
 import java.util.Random;
@@ -31,20 +34,17 @@ public class MainActivity extends AppCompatActivity
 
 
 
-    private int first, second, set, score;
-    private int[] colors;
-    private String[] names;
-    private Random random;
-    private TextView leftText, rightText, textName, textEmail, textScore;
-    private ProgressBar pb;
-    private Button btYes, btNo;
-    public boolean vibroCheck, scored;
     public boolean isGoing;
-    private Button start;
-    private int value;
-    private int time;
+    TextView textName, textEmail;
     private String name;
     private String email;
+    FragmentSettings fgS;
+    FragmentGame fgG;
+    FragmentTransaction ftrans;
+
+    boolean vibroCheck, scored;
+    int time, value, score;
+
 
 
     @Override
@@ -64,10 +64,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        /*
         Toast toast = Toast.makeText(getApplicationContext(),
                 "Запуск", Toast.LENGTH_SHORT);
         toast.show();
-        //
+        */
 
         Intent NickEmIntent = getIntent();
 
@@ -84,154 +85,35 @@ public class MainActivity extends AppCompatActivity
         textEmail = (TextView) navHeader.findViewById(R.id.textEmail1);
         textName.setText(name);
         textEmail.setText(email);
-        textScore = findViewById(R.id.textView3);
 
 
-        first = 0;
-        second = 0;
-        set = 0;
-        score = 0;
+
+
+
+        time = 10;
         vibroCheck = false;
-        value = 5;
-        start = findViewById(R.id.btStartStop);
 
-        rightText = findViewById(R.id.textView2);
-        leftText = findViewById(R.id.textView1);
-        pb = findViewById(R.id.progressBar);
-        btYes = findViewById(R.id.btYes);
-        btNo = findViewById(R.id.btNo);
 
-        btYes.setEnabled(false);
-        btNo.setEnabled(false);
 
-        colors = new int[10];
+        fgS = new FragmentSettings();
+        fgG = new FragmentGame();
 
-        colors[0] = 0xFF000000; //black
-        colors[1] = 0xFFFF0000; //red
-        colors[2] = 0xFF0000FF; //blue
-        colors[3] = 0xFF008000; //green
-        colors[4] = 0xFFFFFF00; //yellow
+        ftrans = getFragmentManager().beginTransaction();
 
-        colors[5] = 0xFF808080; //gray
-        colors[6] = 0xFFFFC0CB; //pink
-        colors[7] = 0xFFA52A2A; //brown
-        colors[8] = 0xFFFFA500; //orange
-        colors[9] = 0xFFBA2BE2; //violet
+        Bundle bundle = new Bundle();
+        bundle.putInt("time", time);
+        bundle.putBoolean("vibro", vibroCheck);
+        fgG.setArguments(bundle);
 
-        names = new String[10];
-
-        names[0] = "Чёрный";
-        names[1] = "Красный";
-        names[2] = "Синий";
-        names[3] = "Зелёный";
-        names[4] = "Жёлтый";
-
-        names[5] = "Серый";
-        names[6] = "Розовый";
-        names[7] = "Коричневый";
-        names[8] = "Оранжевый";
-        names[9] = "Фиолетовый";
-
-        random = new Random();
-
-        Intent intent = getIntent();
-        value = 5;
-        time  = 10;
-        pb.setMax(time);
-
-        second = random.nextInt(value);
-        rightText.setTextColor(colors[second]);
-        set = random.nextInt(value);
-        rightText.setText(names[set]);
-
-        first = random.nextInt(value);
-        leftText.setText(names[first]);
-        set = random.nextInt(value);
-        leftText.setTextColor(colors[set]);
-
+        ftrans.replace(R.id.container, fgG);
+        ftrans.commit();
     }
 
 
-    public void clickbtYes(View view){
-        if (first == second){
-            score ++;
-        }
-
-        second = random.nextInt(value);
-        rightText.setTextColor(colors[second]);
-        set = random.nextInt(value);
-        rightText.setText(names[set]);
-
-        first = random.nextInt(value);
-        leftText.setText(names[first]);
-        set = random.nextInt(value);
-        leftText.setTextColor(colors[set]);
-    }
-
-    public void clickbtNo(View view){
-
-        if (first != second){
-            score++;
-        }
-
-        second = random.nextInt(value);
-        rightText.setTextColor(colors[second]);
-        set = random.nextInt(value);
-        rightText.setText(names[set]);
-
-        first = random.nextInt(value);
-        leftText.setText(names[first]);
-        set = random.nextInt(value);
-        leftText.setTextColor(colors[set]);
-    }
-
-    public void clickbtStartStop (View view){
-
-        if (vibroCheck == true){
-            long mills = 200L;
-            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibrator.hasVibrator()) {
-                vibrator.vibrate(mills);
-            }
-        }
-
-        textScore.setText("");
-
-
-        start.setEnabled(false);
-        btYes.setEnabled(true);
-        btNo.setEnabled(true);
-
-        if (!scored){
-            score = 0;
-        }
 
 
 
-        new CountDownTimer(time*1000, 1000){
-            @Override
-            public void onTick(long l){
-                pb.setProgress((int)(l/1000));
-            }
 
-            @Override
-            public void onFinish(){
-                btYes.setEnabled(false);
-                btNo.setEnabled(false);
-                start.setEnabled(true);
-
-                if (vibroCheck == true){
-                    long mills = 1000L;
-                    Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    if (vibrator.hasVibrator()) {
-                        vibrator.vibrate(mills);
-                    }
-                }
-
-                textScore.setText("Ваш счёт: " + Integer.toString(score));
-            }
-        }.start();
-    }
 
 
 
@@ -273,12 +155,19 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        FragmentTransaction ftrans = getFragmentManager().beginTransaction();
+
 
         if (id == R.id.nav_manage) {
+            ftrans = getFragmentManager().beginTransaction();
 
-        Intent intent = new Intent(this, settings.class);
-        startActivityForResult(intent, 1);
+            ftrans.replace(R.id.container, fgS);
+            ftrans.commit();
+
+
+            /* Активити настроек
+            Intent intent = new Intent(this, settings.class);
+            startActivityForResult(intent, 1);
+            */
 
 
         } else if (id == R.id.nav_send) {
@@ -299,7 +188,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(Intent.createChooser(intent, "Выберите отправитель"));
 
 
-        } ftrans.commit();
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -322,4 +211,51 @@ public class MainActivity extends AppCompatActivity
         }
 
     }//onActivityResult
+
+    public void CloseSettingsFragment(){
+        ftrans = getFragmentManager().beginTransaction();
+
+        ftrans.remove(fgS);
+
+        //Применение настроек ТУТ
+        CheckBox chBox;
+        chBox = fgS.getView().findViewById(R.id.checkBox2);
+        if (chBox.isChecked()){
+            vibroCheck = true;
+        }
+        else {
+            vibroCheck = false;
+        }
+
+        RadioButton rBt10;
+        RadioButton rBt30;
+        RadioButton rBt60;
+        rBt10 = fgS.getView().findViewById(R.id.radioButton10);
+        rBt30 = fgS.getView().findViewById(R.id.radioButton30);
+        rBt60 = fgS.getView().findViewById(R.id.radioButton60);
+
+
+
+        if (rBt10.isChecked()){
+            time = 10;
+        } else if (rBt30.isChecked()){
+            time = 30;
+        } else if (rBt60.isChecked()){
+            time = 60;
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("time", time);
+        bundle.putBoolean("vibro", vibroCheck);
+        fgG.setArguments(bundle);
+
+
+
+        ftrans.replace(R.id.container, fgG);
+        ftrans.commit();
+
+        fgG.SetTimeVibro(time, vibroCheck);
+    }
+
+
 }
