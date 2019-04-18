@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity
 
 
         time = 10;
+        value = 5;
         vibroCheck = false;
 
 
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity
 
         Bundle bundle = new Bundle();
         bundle.putInt("time", time);
+        bundle.putInt("colors", value);
         bundle.putBoolean("vibro", vibroCheck);
         fgG.setArguments(bundle);
 
@@ -243,10 +246,49 @@ public class MainActivity extends AppCompatActivity
         } else if (rBt60.isChecked()){
             time = 60;
         }
+        String S="";
+        Spinner spinner = fgS.getView().findViewById(R.id.spinner);
+        S = spinner.getSelectedItem().toString();
+        switch(S){
+            case "Пять цветов":
+                value = 5;
+                break;
+
+
+            case "Шесть цветов":
+                value = 6;
+                break;
+
+
+            case "Семь цветов":
+                value = 7;
+                break;
+
+
+            case "Восемь цветов":
+                value = 8;
+                break;
+
+
+            case "Девять цветов":
+                value = 9;
+                break;
+
+
+            case "Десять цветов":
+                value = 10;
+                break;
+
+
+            default :
+                value = 5;
+                break;
+        }
 
         Bundle bundle = new Bundle();
         bundle.putInt("time", time);
         bundle.putBoolean("vibro", vibroCheck);
+        bundle.putInt("colors", value);
         fgG.setArguments(bundle);
 
 

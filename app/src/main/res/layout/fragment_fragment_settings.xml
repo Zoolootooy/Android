@@ -16,9 +16,14 @@
             android:layout_height="100dp"
             android:text="Вибрация" />
 
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <RadioGroup
             android:layout_width="match_parent"
-            android:layout_height="124dp">
+            android:layout_height="151dp">
 
             <RadioButton
                 android:id="@+id/radioButton10"

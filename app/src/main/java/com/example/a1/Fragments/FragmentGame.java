@@ -48,13 +48,13 @@ public class FragmentGame extends Fragment {
 
         time = this.getArguments().getInt("time");
         vibroCheck = this.getArguments().getBoolean("vibro");
+        value = this.getArguments().getInt("colors");
 
 
         first = 0;
         second = 0;
         set = 0;
         score = 0;
-        value = 5;
 
         rightText = (TextView) rootView.findViewById(R.id.textView2);
         leftText = (TextView) rootView.findViewById(R.id.textView1);
@@ -189,8 +189,6 @@ public class FragmentGame extends Fragment {
 
         random = new Random();
 
-
-        value = 5;
 
 
         second = random.nextInt(value);
