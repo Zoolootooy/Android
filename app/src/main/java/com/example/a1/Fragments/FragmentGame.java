@@ -109,6 +109,8 @@ public class FragmentGame extends Fragment {
                         }
 
                         textScore.setText("Ваш счёт: " + Integer.toString(score));
+                        //Вызвать метод МеинАктивити для записи счёта в базу
+                        ((MainActivity)getActivity()).AddScoreInBase(score, time);
                     }
                 }.start();
             }

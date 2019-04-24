@@ -2,11 +2,15 @@ package com.example.a1;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,8 +30,11 @@ import android.widget.Toast;
 
 
 import com.example.a1.Fragments.FragmentGame;
+import com.example.a1.Fragments.FragmentScore;
 import com.example.a1.Fragments.FragmentSettings;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
@@ -41,12 +48,13 @@ public class MainActivity extends AppCompatActivity
     private String email;
     FragmentSettings fgS;
     FragmentGame fgG;
+    FragmentScore fgSc;
     FragmentTransaction ftrans;
 
     boolean vibroCheck, scored;
     int time, value, score;
 
-
+    DBHelper dbhelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         email = NickEmIntent.getStringExtra("email");
 
 
-
+        dbhelper = new DBHelper(this);
 
 
 
@@ -99,6 +107,7 @@ public class MainActivity extends AppCompatActivity
 
         fgS = new FragmentSettings();
         fgG = new FragmentGame();
+        fgSc = new FragmentScore();
 
         ftrans = getFragmentManager().beginTransaction();
 
@@ -114,7 +123,16 @@ public class MainActivity extends AppCompatActivity
 
 
 
+    public void AddScoreInBase(int iScore, int iTime){
+        SQLiteDatabase database = dbhelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
 
+        contentValues.put(DBHelper.KEY_NAME, name);
+        contentValues.put(DBHelper.KEY_SCORE, iScore);
+        contentValues.put(DBHelper.KEY_TIME, iTime);
+        database.insert(DBHelper.TABLE_SCORE, null, contentValues);
+        dbhelper.close();
+    }
 
 
 
@@ -191,6 +209,46 @@ public class MainActivity extends AppCompatActivity
             startActivity(Intent.createChooser(intent, "Выберите отправитель"));
 
 
+        } else if (id == R.id.nav_score){
+           // ftrans = getFragmentManager().beginTransaction();
+
+
+
+            int idIndex;
+            ArrayList<String> DATA = new ArrayList();
+
+            SQLiteDatabase database = dbhelper.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+
+            Cursor cursor = database.query(DBHelper.TABLE_SCORE, null, null, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
+                int nameIndex = cursor.getColumnIndex(DBHelper.KEY_NAME);
+                int scoreIndex = cursor.getColumnIndex(DBHelper.KEY_SCORE);
+                int timeIndex = cursor.getColumnIndex(DBHelper.KEY_TIME);
+                do {
+                    Log.d("mLog", "ID = " + cursor.getInt(idIndex) +
+                            ", name = " + cursor.getString(nameIndex) +
+                            ", score = " + cursor.getInt(scoreIndex) +
+                            ", time = " + cursor.getInt(timeIndex));
+
+                    String S =  "Name = " + cursor.getString(nameIndex) +
+                            ", Score = " + cursor.getInt(scoreIndex) +
+                            ", Time = " + cursor.getInt(timeIndex);
+                    DATA.add(S);
+
+                } while (cursor.moveToNext());
+            } else {
+                Log.d("mLog", "0 rows");
+            }
+
+            cursor.close();
+            dbhelper.close();
+
+
+            Intent intentS = new Intent(this, ScoreActivity.class);
+            intentS.putExtra("DATA", DATA);
+            startActivity(intentS);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
